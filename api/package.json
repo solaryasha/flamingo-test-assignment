@@ -2,7 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "dev": "tsx --watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc",
@@ -23,6 +23,7 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
+    "prettier": "^3.6.2",
     "tsx": "^4.20.4",
     "typescript": "^5.9.2"
   }
