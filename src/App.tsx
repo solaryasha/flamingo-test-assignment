@@ -20,10 +20,8 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  console.log(session);
-
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    await supabase.auth.signOut();
   };
 
   const signUp = async () => {
@@ -31,6 +29,22 @@ function App() {
       provider: "google",
     });
   };
+
+  const addBook = async () => {
+    const response = await fetch('/api/books', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      },
+      body: JSON.stringify({
+        title: 'Bible',
+        author: 'God',
+      })
+    });
+
+    await response.json();
+  }
 
   if (!session) {
     return (
@@ -42,6 +56,7 @@ function App() {
     return (
       <div>
         <h2>Welcome, {session?.user?.email}</h2>
+        <button onClick={addBook}>Add a book to reading list</button>
         <button onClick={signOut}>Sign out</button>
       </div>
     );

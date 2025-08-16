@@ -1,24 +1,15 @@
 import express from 'express';
+import bookController from '../controllers/bookController';
 
 const booksRouter = express.Router();
 
 // Add a new book
-booksRouter.post('/', (req, res) => {
-  // Logic to add a new book
-  res.status(201).send({ message: 'Book created' });
-});
+booksRouter.post('/', bookController.addBook);
 
 // Get all of the user's books
 booksRouter.get('/', (req, res) => {
   // Logic to get all books
   res.send([{ id: 1, title: 'Book 1' }]);
-});
-
-// Get a single book by its ID
-booksRouter.get('/:bookId', (req, res) => {
-  const { bookId } = req.params;
-  // Logic to get a book by ID
-  res.send({ id: bookId, title: `Book ${bookId}` });
 });
 
 // Update an existing book
