@@ -58,7 +58,7 @@ function App() {
   };
 
   const updateBook = async () => {
-    const bookId = 2;
+    const bookId = 3;
     const response = await fetch(`/api/books/${bookId}`, {
       method: 'PATCH',
       headers: {
@@ -72,7 +72,20 @@ function App() {
       })
     });
     const updatedBook = await response.json();
-    console.log(updatedBook);
+    console.log('updatedBook:', updatedBook);
+  };
+
+  const deleteBook = async () => {
+    const bookId = 2;
+    const response = await fetch(`/api/books/${bookId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      }
+    });
+    const result = await response.json();
+    console.log('Delete result:', result);
   };
 
   if (!session) {
@@ -88,6 +101,7 @@ function App() {
         <button onClick={addBook}>Add a book to reading list</button>
         <button onClick={getBooks}>Get books</button>
         <button onClick={updateBook}>Update book info</button>
+        <button onClick={deleteBook}>Delete book</button>
         <button onClick={signOut}>Sign out</button>
       </div>
     );

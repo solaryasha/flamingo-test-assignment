@@ -69,12 +69,29 @@ const updateBook = async (req: Request, res: Response) => {
     });
     res.status(200).json(updatedBook);
   } catch (error) {
+    console.log('error while updating book book:', error);
     res.status(500).json({ message: 'Failed to update book', error });        
   }
 };
 
+const deleteBook = async (req: Request, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+  const { bookId } = req.params;
+  try {
+    await prisma.book.delete({
+      where: { id: Number(bookId), userId: req.user.id },
+    });
+    res.status(200).json({ message: `Book ${bookId} deleted` });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete book', error });
+  }
+}
+
 export default {
   addBook,
   getBooks,
-  updateBook
+  updateBook,
+  deleteBook
 }

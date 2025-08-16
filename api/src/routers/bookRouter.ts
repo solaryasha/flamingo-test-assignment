@@ -10,11 +10,6 @@ booksRouter.get('/', isAuthenticated, bookController.getBooks);
 
 booksRouter.patch('/:bookId', isAuthenticated, bookController.updateBook);
 
-// Delete a book
-booksRouter.delete('/:bookId', (req, res) => {
-  const { bookId } = req.params;
-  // Logic to delete a book
-  res.send({ message: `Book ${bookId} deleted` });
-});
+booksRouter.delete('/:bookId', isAuthenticated, bookController.deleteBook);
 
 export default booksRouter;
