@@ -1,16 +1,12 @@
 import express from 'express';
 import bookController from '../controllers/bookController';
+import { isAuthenticated } from '../middlewares/isAuthenticated';
 
 const booksRouter = express.Router();
 
-// Add a new book
-booksRouter.post('/', bookController.addBook);
+booksRouter.post('/', isAuthenticated, bookController.addBook);
 
-// Get all of the user's books
-booksRouter.get('/', (req, res) => {
-  // Logic to get all books
-  res.send([{ id: 1, title: 'Book 1' }]);
-});
+booksRouter.get('/', isAuthenticated, bookController.getBooks);
 
 // Update an existing book
 booksRouter.patch('/:bookId', (req, res) => {

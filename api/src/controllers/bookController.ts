@@ -1,14 +1,10 @@
 import { Request, Response } from 'express';
 import { ReadingStatus } from '../generated/prisma';
-import { supabase } from '../services/supabase';
 import prisma from '../services/db';
 
 const addBook = async (req: Request, res: Response) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.split(' ')[1];
-  const getUserResponse = await supabase.auth.getUser(token);
-  if (!getUserResponse.data?.user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  if (!req.user) {
+    return res.status(401).json({ message: 'User not authenticated' });
   }
   try {
     const { title, author } = req.body;
@@ -21,7 +17,7 @@ const addBook = async (req: Request, res: Response) => {
         title,
         author,
         status: ReadingStatus.TO_READ,
-        userId: getUserResponse.data.user.id,
+        userId: req.user.id
       },
     });
 
@@ -31,7 +27,32 @@ const addBook = async (req: Request, res: Response) => {
   }
 };
 
+const getBooks = async (req: Request, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  try {
+    const books = await prisma.book.findMany({
+      where: {
+        userId: req.user.id,
+      },
+    });
+
+    const mappedBooks = books.map(({ id, title, author, status }) => ({
+      id,
+      title,
+      author,
+      status
+    }));
+
+    return res.status(200).json(mappedBooks);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to create book', error });
+  }
+}
 
 export default {
-  addBook
+  addBook,
+  getBooks
 }

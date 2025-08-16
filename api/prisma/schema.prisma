@@ -26,6 +26,7 @@ model Book {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("books")
+  @@index([userId])
 }
 model User {
   id    String @db.Uuid @id @default(uuid())

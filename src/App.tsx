@@ -46,6 +46,17 @@ function App() {
     await response.json();
   }
 
+  const getBooks = async () => {
+    const response = await fetch('/api/books', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      }
+    });
+    console.log(await response.json());
+  };
+
   if (!session) {
     return (
       <>
@@ -57,6 +68,7 @@ function App() {
       <div>
         <h2>Welcome, {session?.user?.email}</h2>
         <button onClick={addBook}>Add a book to reading list</button>
+        <button onClick={getBooks}>Get books</button>
         <button onClick={signOut}>Sign out</button>
       </div>
     );
