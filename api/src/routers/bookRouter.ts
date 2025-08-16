@@ -8,12 +8,7 @@ booksRouter.post('/', isAuthenticated, bookController.addBook);
 
 booksRouter.get('/', isAuthenticated, bookController.getBooks);
 
-// Update an existing book
-booksRouter.patch('/:bookId', (req, res) => {
-  const { bookId } = req.params;
-  // Logic to update a book
-  res.send({ message: `Book ${bookId} updated` });
-});
+booksRouter.patch('/:bookId', isAuthenticated, bookController.updateBook);
 
 // Delete a book
 booksRouter.delete('/:bookId', (req, res) => {

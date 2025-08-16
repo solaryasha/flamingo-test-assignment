@@ -57,6 +57,24 @@ function App() {
     console.log(await response.json());
   };
 
+  const updateBook = async () => {
+    const bookId = 2;
+    const response = await fetch(`/api/books/${bookId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token}`
+      },
+
+      body: JSON.stringify({
+        title: 'Koran',
+        status: 'READING'
+      })
+    });
+    const updatedBook = await response.json();
+    console.log(updatedBook);
+  };
+
   if (!session) {
     return (
       <>
@@ -69,6 +87,7 @@ function App() {
         <h2>Welcome, {session?.user?.email}</h2>
         <button onClick={addBook}>Add a book to reading list</button>
         <button onClick={getBooks}>Get books</button>
+        <button onClick={updateBook}>Update book info</button>
         <button onClick={signOut}>Sign out</button>
       </div>
     );

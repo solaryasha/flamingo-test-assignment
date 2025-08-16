@@ -52,7 +52,29 @@ const getBooks = async (req: Request, res: Response) => {
   }
 }
 
+const updateBook = async (req: Request, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+  const { bookId } = req.params;
+  const { title, author, status } = req.body;
+  try {
+    const updatedBook = await prisma.book.update({
+      where: { id: Number(bookId), userId: req.user.id },
+      data: {
+        title,
+        author,
+        status,
+      },
+    });
+    res.status(200).json(updatedBook);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update book', error });        
+  }
+};
+
 export default {
   addBook,
-  getBooks
+  getBooks,
+  updateBook
 }
