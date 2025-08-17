@@ -1,8 +1,8 @@
-import type { ActiveTab, Book as BookType } from '../types';
+import type { ReadingStatus, Book as BookType } from '../types';
 import { Book, BookOpen, CheckCircle } from 'lucide-react';
 
 
-export const getTabCount = (books: BookType[], status: ActiveTab) => {
+export const getTabCount = (books: BookType[], status: ReadingStatus) => {
   return books.filter(book => book.status === status).length;
 };
 
@@ -19,7 +19,7 @@ export const getEmptyStateMessage = (activeTab: string) => {
   }
 };
 
-export const getTabIcon = (tab: ActiveTab) => {
+export const getTabIcon = (tab: ReadingStatus) => {
     switch (tab) {
       case 'TO_READ': return <Book className="w-4 h-4" />;
       case 'READING': return <BookOpen className="w-4 h-4" />;

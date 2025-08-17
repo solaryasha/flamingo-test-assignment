@@ -1,15 +1,23 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tabs } from './ui/tabs';
 import { useMemo, useState } from 'react';
-import { TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf';
-import type { ActiveTab } from './types';
 import { useBooks } from './hooks/useBooks';
+import { Button } from './ui/button';
+import { Plus } from 'lucide-react';
+import type { Book } from './types';
+import AddBookDialog from './AddBookDialog';
+import BookCard from './BookCard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 
 export const Bookshelf = () => {
   const [activeTab, setActiveTab] = useState('TO_READ');
-  const books = useBooks();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [books, setBooks] = useBooks();
+
+  const onAddBook = (newBook: Book) => {
+    setBooks(prevBooks => [...prevBooks, newBook]);
+  };
 
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
   return (
@@ -38,7 +46,7 @@ export const Bookshelf = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3 glass-effect border-white/20 p-1">
               <TabsTrigger
-                value="to-read"
+                value="TO_READ"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
               >
                 {getTabIcon('TO_READ')}
@@ -49,7 +57,7 @@ export const Bookshelf = () => {
                 </span>
               </TabsTrigger>
               <TabsTrigger
-                value="reading"
+                value="READING"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500/30 data-[state=active]:to-blue-500/30 data-[state=active]:text-white"
               >
                 {getTabIcon('READING')}
@@ -60,7 +68,7 @@ export const Bookshelf = () => {
                 </span>
               </TabsTrigger>
               <TabsTrigger
-                value="read"
+                value="READ"
                 className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/30 data-[state=active]:to-pink-500/30 data-[state=active]:text-white"
               >
                 {getTabIcon('READ')}
@@ -72,7 +80,6 @@ export const Bookshelf = () => {
               </TabsTrigger>
             </TabsList>
 
-            {/* Tab Content */}
             <div className="mt-8">
               <TabsContent value={activeTab} className="mt-0">
                 <AnimatePresence mode="wait">
@@ -92,13 +99,13 @@ export const Bookshelf = () => {
                         <p className="text-gray-400 mb-6">
                           Click the + button below to add your first book
                         </p>
-                        {/* <Button
+                        <Button
                           onClick={() => setIsAddDialogOpen(true)}
                           className="floating-gradient hover:scale-105 transition-transform"
                         >
                           <Plus className="w-4 h-4 mr-2" />
                           Add Book
-                        </Button> */}
+                        </Button>
                       </div>
                     </motion.div>
                   ) : (
@@ -116,11 +123,11 @@ export const Bookshelf = () => {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.1 }}
                         >
-                          {/* <BookCard
+                          <BookCard
                             book={book}
-                            onStatusChange={updateBookStatus}
-                            onDelete={deleteBook}
-                          /> */}
+                            // onStatusChange={updateBookStatus}
+                            // onDelete={deleteBook}
+                          />
                         </motion.div>
                       ))}
                     </motion.div>
@@ -131,8 +138,8 @@ export const Bookshelf = () => {
           </Tabs>
         </motion.div>
 
-        {/* Floating Action Button */}
-        {/* <motion.div
+  
+        <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
@@ -145,14 +152,13 @@ export const Bookshelf = () => {
           >
             <Plus className="w-6 h-6" />
           </Button>
-        </motion.div> */}
+        </motion.div>
 
-        {/* Add Book Dialog */}
-        {/* <AddBookDialog
+        <AddBookDialog
           isOpen={isAddDialogOpen}
           onClose={() => setIsAddDialogOpen(false)}
-          onAddBook={addBook}
-        /> */}
+          onAddBook={onAddBook}
+        />
       </div>
     </div>
   );

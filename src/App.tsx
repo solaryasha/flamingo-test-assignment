@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import { supabase } from "../supabaseClient";
 import { type Session } from '@supabase/supabase-js';
 import { Bookshelf } from './Bookshelf';

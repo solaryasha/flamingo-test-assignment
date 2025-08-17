@@ -27,5 +27,5 @@ export const useBooks = () => {
     fetchBooks();
   }, [])
 
-  return books;
+  return [books, setBooks] as const;
 }
