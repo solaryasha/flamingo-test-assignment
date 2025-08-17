@@ -1,0 +1,8 @@
+export type ActiveTab = 'TO_READ' | 'READING' | 'READ';
+
+export interface Book {
+  id: number;
+  title: string;
+  author: string;
+  status: ActiveTab;
+}

@@ -1,0 +1,159 @@
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tabs } from './ui/tabs';
+import { useMemo, useState } from 'react';
+import { TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
+import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf';
+import type { ActiveTab } from './types';
+import { useBooks } from './hooks/useBooks';
+
+
+export const Bookshelf = () => {
+  const [activeTab, setActiveTab] = useState('TO_READ');
+  const books = useBooks();
+
+  const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
+  return (
+    <div className="min-h-screen p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
+            My Personal Bookshelf
+          </h1>
+          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            Organize and track your reading journey with style
+          </p>
+        </motion.div>
+
+  
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 glass-effect border-white/20 p-1">
+              <TabsTrigger
+                value="to-read"
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/30 data-[state=active]:to-purple-500/30 data-[state=active]:text-white"
+              >
+                {getTabIcon('TO_READ')}
+                <span className="hidden sm:inline">To Read</span>
+                <span className="sm:hidden">To Read</span>
+                <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                  {getTabCount(books,'TO_READ')}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="reading"
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500/30 data-[state=active]:to-blue-500/30 data-[state=active]:text-white"
+              >
+                {getTabIcon('READING')}
+                <span className="hidden sm:inline">Reading</span>
+                <span className="sm:hidden">Reading</span>
+                <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                  {getTabCount(books, 'READING')}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="read"
+                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/30 data-[state=active]:to-pink-500/30 data-[state=active]:text-white"
+              >
+                {getTabIcon('READ')}
+                <span className="hidden sm:inline">Read</span>
+                <span className="sm:hidden">Read</span>
+                <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                  {getTabCount(books, 'READ')}
+                </span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Tab Content */}
+            <div className="mt-8">
+              <TabsContent value={activeTab} className="mt-0">
+                <AnimatePresence mode="wait">
+                  {filteredBooks.length === 0 ? (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="text-center py-16"
+                    >
+                      <div className="glass-effect rounded-2xl p-8 max-w-md mx-auto">
+                        <div className="text-6xl mb-4">📚</div>
+                        <h3 className="text-xl font-semibold mb-2 text-white">
+                          {getEmptyStateMessage(activeTab)}
+                        </h3>
+                        <p className="text-gray-400 mb-6">
+                          Click the + button below to add your first book
+                        </p>
+                        {/* <Button
+                          onClick={() => setIsAddDialogOpen(true)}
+                          className="floating-gradient hover:scale-105 transition-transform"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Book
+                        </Button> */}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="books"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                    >
+                      {filteredBooks.map((book, index) => (
+                        <motion.div
+                          key={book.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          {/* <BookCard
+                            book={book}
+                            onStatusChange={updateBookStatus}
+                            onDelete={deleteBook}
+                          /> */}
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </TabsContent>
+            </div>
+          </Tabs>
+        </motion.div>
+
+        {/* Floating Action Button */}
+        {/* <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <Button
+            onClick={() => setIsAddDialogOpen(true)}
+            size="lg"
+            className="floating-gradient rounded-full w-14 h-14 shadow-2xl hover:scale-110 transition-all duration-300 hover:shadow-purple-500/25"
+          >
+            <Plus className="w-6 h-6" />
+          </Button>
+        </motion.div> */}
+
+        {/* Add Book Dialog */}
+        {/* <AddBookDialog
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onAddBook={addBook}
+        /> */}
+      </div>
+    </div>
+  );
+}

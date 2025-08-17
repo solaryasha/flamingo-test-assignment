@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { supabase } from "../supabaseClient";
 import { type Session } from '@supabase/supabase-js';
+import { Bookshelf } from './Bookshelf';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -96,14 +97,7 @@ function App() {
     );
   } else {
     return (
-      <div>
-        <h2>Welcome, {session?.user?.email}</h2>
-        <button onClick={addBook}>Add a book to reading list</button>
-        <button onClick={getBooks}>Get books</button>
-        <button onClick={updateBook}>Update book info</button>
-        <button onClick={deleteBook}>Delete book</button>
-        <button onClick={signOut}>Sign out</button>
-      </div>
+      <Bookshelf />
     );
   }
 }

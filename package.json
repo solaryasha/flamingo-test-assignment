@@ -11,8 +11,12 @@
     "api": "cd api && npm run dev"
   },
   "dependencies": {
+    "@radix-ui/react-tabs": "^1.1.13",
     "@supabase/supabase-js": "^2.55.0",
     "@tailwindcss/vite": "^4.1.12",
+    "classnames": "^2.5.1",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.539.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.12"
