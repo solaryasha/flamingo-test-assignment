@@ -4,7 +4,7 @@ import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf
 import { useBooks } from './hooks/useBooks';
 import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
-import type { Book } from './types';
+import type { Book, ReadingStatus } from './types';
 import AddBookDialog from './AddBookDialog';
 import BookCard from './BookCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -15,9 +15,16 @@ export const Bookshelf = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [books, setBooks] = useBooks();
 
+
   const onAddBook = (newBook: Book) => {
     setBooks(prevBooks => [...prevBooks, newBook]);
   };
+
+  const updateBookStatus = (bookId: number, newStatus: ReadingStatus) => {
+    setBooks(previousBooks => previousBooks.map(book => 
+      book.id === bookId ? { ...book, status: newStatus } : book
+    ));
+  }
 
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
   return (
@@ -125,7 +132,7 @@ export const Bookshelf = () => {
                         >
                           <BookCard
                             book={book}
-                            // onStatusChange={updateBookStatus}
+                            onStatusChange={updateBookStatus}
                             // onDelete={deleteBook}
                           />
                         </motion.div>

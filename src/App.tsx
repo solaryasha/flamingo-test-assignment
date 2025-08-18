@@ -90,9 +90,9 @@ function App() {
 
   if (!session) {
     return (
-      <>
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
         <button onClick={signUp}>Sign in with Google</button>
-      </>
+      </div>
     );
   } else {
     return (

@@ -7,7 +7,7 @@ const addBook = async (req: Request, res: Response) => {
     return res.status(401).json({ message: 'User not authenticated' });
   }
   try {
-    const { title, author } = req.body;
+    const { title, author, status =  ReadingStatus.TO_READ } = req.body;
     if (!title || !author) {
       return res.status(400).json({ message: 'title and author are required' });
     }
@@ -16,7 +16,7 @@ const addBook = async (req: Request, res: Response) => {
       data: {
         title,
         author,
-        status: ReadingStatus.TO_READ,
+        status,
         userId: req.user.id
       },
     });

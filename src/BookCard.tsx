@@ -1,5 +1,4 @@
 import React, { type FC } from 'react';
-import { motion } from 'framer-motion';
 import { MoreVertical, Edit, Trash2, BookOpen, CheckCircle, Clock } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown';
 import type { Book, ReadingStatus } from './types';
@@ -7,11 +6,11 @@ import { Button } from './ui/button';
 
 interface Props {
   book: Book
-  // onStatusChange:
+  onStatusChange: (bookId: number, status: ReadingStatus) => void;
 }
 
 
-const BookCard: FC<Props> = ({ book}) => {
+const BookCard: FC<Props> = ({ book, onStatusChange }) => {
   const getStatusColor = (status: ReadingStatus) => {
     switch (status) {
       case 'TO_READ': return 'from-blue-500/20 to-purple-500/20';
@@ -39,7 +38,9 @@ const BookCard: FC<Props> = ({ book}) => {
     }
   };
 
-  const handleStatusChange = (newStatus) => {};
+  const handleStatusChange = (newStatus: ReadingStatus) => {
+    onStatusChange(book.id, newStatus);
+  };
 
   const handleEdit = () => {};
 
@@ -105,7 +106,7 @@ const BookCard: FC<Props> = ({ book}) => {
           <Button
             size="sm"
             variant="default"
-            onClick={() => handleStatusChange('read')}
+            onClick={() => handleStatusChange('READ')}
             className="flex-1 border-white/20 text-white hover:bg-white/10"
           >
             Mark as Read

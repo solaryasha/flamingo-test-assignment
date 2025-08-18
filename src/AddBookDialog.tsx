@@ -88,9 +88,9 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="glass-effect border-white/20">
-                <SelectItem value="to-read">To Read</SelectItem>
-                <SelectItem value="reading">Currently Reading</SelectItem>
-                <SelectItem value="read">Completed</SelectItem>
+                <SelectItem value="TO_READ">To Read</SelectItem>
+                <SelectItem value="READING">Currently Reading</SelectItem>
+                <SelectItem value="READ">Completed</SelectItem>
               </SelectContent>
             </Select>
           </div>
