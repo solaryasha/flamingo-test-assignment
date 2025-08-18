@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cookieParser from "cookie-parser";
 import type { Request, Response } from "express";
 import env from "dotenv";
@@ -28,6 +29,11 @@ app.get("/health", (_req: Request, res: Response) => {
   res.status(200).send(data);
 });
 
+app.use(express.static(path.join(__dirname, '../../dist')));
+
+app.use('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../dist', 'index.html'));
+});
 app.use(errorHandler);
 
 export const server = app.listen(port, () => {
