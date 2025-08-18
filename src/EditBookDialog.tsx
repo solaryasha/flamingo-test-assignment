@@ -8,16 +8,34 @@ import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import type { Book } from './types';
 import { useUpdateBook } from './hooks/useUpdateBook';
+import { useToast } from './hooks/useToast';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onUpdateBook: (bookId: number, data: Partial<Omit<Book, "id">>) => void;
   book: Book | null;
+  onRollback: (bookId: number, book: Book) => void;
 }
 
-const EditBookDialog: FC<Props> = ({ isOpen, onClose, onUpdateBook, book }) => {
-  const { updateBook } = useUpdateBook(book?.id);
+const EditBookDialog: FC<Props> = ({ isOpen, onClose, onUpdateBook, book, onRollback }) => {
+  const { toast } = useToast();
+  const { updateBook } = useUpdateBook(book!.id, {
+    onSuccess: () => {
+      toast({
+        title: "Book updated! 📚",
+        description: "Your book updates have been added successfully.",
+      });
+    },
+    onError: () => {
+      const previousBook = book;
+      toast({
+        title: "Update Failed! ❌",
+        description: "There was an error updating the book.",
+      });
+      onRollback(book!.id, previousBook!);
+    }
+  });
   const [formData, setFormData] = useState({
     title: book?.title || '',
     author: book?.author || '',
@@ -27,13 +45,13 @@ const EditBookDialog: FC<Props> = ({ isOpen, onClose, onUpdateBook, book }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (book && formData?.title && formData?.author) {
-      await updateBook({ title: formData.title, author: formData.author, status: formData.status });
       onUpdateBook(book.id, formData);
       onClose();
+      await updateBook({ title: formData.title, author: formData.author, status: formData.status });
     }
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof Book, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -53,7 +71,7 @@ const EditBookDialog: FC<Props> = ({ isOpen, onClose, onUpdateBook, book }) => {
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleInputChange('title', event.target.value)}
               placeholder="Enter book title"
               className="glass-effect border-white/20 text-white placeholder:text-gray-400"
               required
@@ -65,7 +83,7 @@ const EditBookDialog: FC<Props> = ({ isOpen, onClose, onUpdateBook, book }) => {
             <Input
               id="author"
               value={formData.author}
-              onChange={(e) => handleInputChange('author', e.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleInputChange('author', event.target.value)}
               placeholder="Enter author name"
               className="glass-effect border-white/20 text-white placeholder:text-gray-400"
               required

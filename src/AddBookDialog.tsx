@@ -69,7 +69,7 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook, onRollback, onSu
     }
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof BookType, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

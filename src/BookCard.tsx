@@ -37,6 +37,7 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit, onRestore
       onStatusChange(book.id, previousStatus);
     }
   });
+  
   const { deleteBook } = useDeleteBook(book.id, {
     onSuccess: () => {
       toast({
@@ -79,7 +80,7 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit, onRestore
             {getStatusLabel(book.status)}
           </span>
         </div>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-white">
@@ -91,8 +92,8 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit, onRestore
               <Edit className="w-4 h-4 mr-2" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={handleDelete} 
+            <DropdownMenuItem
+              onClick={handleDelete}
               className="text-red-400 hover:bg-red-500/10 hover:text-red-300"
             >
               <Trash2 className="w-4 h-4 mr-2" />
@@ -123,7 +124,7 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit, onRestore
             {book.status === 'TO_READ' ? 'Start Reading' : 'Read Again'}
           </Button>
         )}
-        
+
         {book.status !== 'READ' && (
           <Button
             size="sm"

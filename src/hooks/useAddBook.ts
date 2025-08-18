@@ -43,7 +43,6 @@ export const useAddBook = ({
       if (!response.ok) {
         throw new Error('Failed to add book');
       }
-      console.log('onSuccess called');
       onSuccess(newBook);
       return newBook;
     } catch {

@@ -19,7 +19,6 @@ export const Bookshelf = () => {
   const [books, setBooks] = useBooks();
 
   const onAddBook = useCallback((newBook: Book) => {
-    console.log('Adding book:', newBook);
     setBooks(prevBooks => [...prevBooks, newBook]);
   }, []);
 
@@ -60,6 +59,12 @@ export const Bookshelf = () => {
       })
     })
   }, []);
+
+  const rollbackBook = useCallback((bookId: number, bookUpdates: Omit<Book, 'id'>) => {
+    setBooks(previousBooks => previousBooks.map(book =>
+      book.id === bookId ? { ...book, ...bookUpdates } : book
+    ));
+  }, [])
 
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
 
@@ -217,6 +222,7 @@ export const Bookshelf = () => {
             }}
             onUpdateBook={updateBook}
             book={editingBook}
+            onRollback={rollbackBook}
           />
         )}
       </div>
