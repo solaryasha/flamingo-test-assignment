@@ -10,10 +10,11 @@ interface Props {
   book: Book
   onStatusChange: (bookId: number, status: ReadingStatus) => void;
   onDelete: (bookId: number) => void;
+  onEdit: (book: Book) => void;
 }
 
 
-const BookCard: FC<Props> = ({ book, onStatusChange, onDelete }) => {
+const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit }) => {
   const getStatusColor = (status: ReadingStatus) => {
     switch (status) {
       case 'TO_READ': return 'from-blue-500/20 to-purple-500/20';
@@ -49,7 +50,9 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete }) => {
     onStatusChange(book.id, newStatus);
   };
 
-  const handleEdit = () => {};
+  const handleEdit = () => {
+    onEdit(book);
+  };
 
   const handleDelete = async () => {
     await deleteBook();

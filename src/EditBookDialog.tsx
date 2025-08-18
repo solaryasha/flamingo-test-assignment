@@ -1,42 +1,34 @@
-import React, { useState, type FC } from 'react';
-import { Book } from 'lucide-react';
-import type { ReadingStatus, Book as BookType } from './types';
+import React, { useState, useEffect, type FC } from 'react';
+import { Edit } from 'lucide-react';
 import { DialogHeader } from './ui/dialog';
 import { Label } from '@radix-ui/react-label';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useAddBook } from './hooks/useAddBook';
+import type { Book } from './types';
+import { useUpdateBook } from './hooks/useUpdateBook';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onAddBook: (book: BookType) => void;
+  onUpdateBook: (bookId: number, data: Partial<Omit<Book, "id">>) => void;
+  book: Book | null;
 }
 
-const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
-  const { addBook } = useAddBook()
+const EditBookDialog: FC<Props> = ({ isOpen, onClose, onUpdateBook, book }) => {
+  const { updateBook } = useUpdateBook(book?.id);
   const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    status: 'TO_READ',
+    title: book?.title || '',
+    author: book?.author || '',
+    status: book?.status || 'TO_READ',
   });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (formData.title && formData.author) {
-      const newBook = await addBook({
-        title: formData.title,
-        author: formData.author,
-        status: formData.status as ReadingStatus
-      })
-      setFormData({
-        title: '',
-        author: '',
-        status: 'TO_READ',
-      });
-      onAddBook(newBook);
+    if (book && formData?.title && formData?.author) {
+      await updateBook({ title: formData.title, author: formData.author, status: formData.status });
+      onUpdateBook(book.id, formData);
       onClose();
     }
   };
@@ -50,8 +42,8 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
       <DialogContent className="glass-effect border-white/20 text-white max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
-            <Book className="w-5 h-5" />
-            Add New Book
+            <Edit className="w-5 h-5" />
+            Edit Book
           </DialogTitle>
         </DialogHeader>
 
@@ -105,10 +97,9 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
             </Button>
             <Button
               type="submit"
-              variant="solid"
               className="flex-1 floating-gradient hover:scale-105 transition-transform"
             >
-              Add Book
+              Save Changes
             </Button>
           </div>
         </form>
@@ -117,4 +108,4 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
   );
 };
 
-export default AddBookDialog;
+export default EditBookDialog;

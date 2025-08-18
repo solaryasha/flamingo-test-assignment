@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { supabase } from "../../supabaseClient";
 import type { ReadingStatus } from '../types';
 
-export const useUpdateBook = (bookId: number) => {
+export const useUpdateBook = (bookId?: number) => {
   const updateBook = useCallback(async ({
     title,
     author,
@@ -12,6 +12,7 @@ export const useUpdateBook = (bookId: number) => {
     author?: string;
     status?: ReadingStatus;
   }) => {
+    if (!bookId) return;
     const authData = await supabase.auth.getSession();
     const session = authData.data.session;
     const response = await fetch(`/api/books/${bookId}`, {

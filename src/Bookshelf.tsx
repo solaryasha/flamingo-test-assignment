@@ -8,16 +8,27 @@ import type { Book, ReadingStatus } from './types';
 import AddBookDialog from './AddBookDialog';
 import BookCard from './BookCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import EditBookDialog from './EditBookDialog';
 
 
 export const Bookshelf = () => {
   const [activeTab, setActiveTab] = useState('TO_READ');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [books, setBooks] = useBooks();
 
 
   const onAddBook = useCallback((newBook: Book) => {
     setBooks(prevBooks => [...prevBooks, newBook]);
+  }, []);
+
+  const updateBook = useCallback((bookId: number, updatedBookData: Partial<Omit<Book, 'id'>>) => {
+    setBooks(prev => prev.map(book => 
+      book.id === bookId ? { ...book, ...updatedBookData } : book
+    ));
+    setIsEditDialogOpen(false);
+    setEditingBook(null);
   }, []);
 
   const updateBookStatus = useCallback((bookId: number, newStatus: ReadingStatus) => {
@@ -28,6 +39,11 @@ export const Bookshelf = () => {
 
   const deleteBook = useCallback((bookId: number) => {
     setBooks(prev => prev.filter(book => book.id !== bookId));
+  }, []);
+
+   const handleEditBook = useCallback((book: Book) => {
+    setEditingBook(book);
+    setIsEditDialogOpen(true);
   }, []);
 
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
@@ -138,6 +154,7 @@ export const Bookshelf = () => {
                             book={book}
                             onStatusChange={updateBookStatus}
                             onDelete={deleteBook}
+                            onEdit={handleEditBook}
                           />
                         </motion.div>
                       ))}
@@ -169,7 +186,20 @@ export const Bookshelf = () => {
           isOpen={isAddDialogOpen}
           onClose={() => setIsAddDialogOpen(false)}
           onAddBook={onAddBook}
+
         />
+
+        {editingBook && (
+          <EditBookDialog
+            isOpen={isEditDialogOpen}
+            onClose={() => {
+              setIsEditDialogOpen(false);
+              setEditingBook(null);
+            }}
+            onUpdateBook={updateBook}
+            book={editingBook}
+          />
+        )}
       </div>
     </div>
   );

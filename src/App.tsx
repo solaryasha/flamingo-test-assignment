@@ -30,64 +30,6 @@ function App() {
     });
   };
 
-  const addBook = async () => {
-    const response = await fetch('/api/books', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token}`
-      },
-      body: JSON.stringify({
-        title: 'Bible',
-        author: 'God',
-      })
-    });
-
-    await response.json();
-  }
-
-  const getBooks = async () => {
-    const response = await fetch('/api/books', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token}`
-      }
-    });
-    console.log(await response.json());
-  };
-
-  const updateBook = async () => {
-    const bookId = 3;
-    const response = await fetch(`/api/books/${bookId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token}`
-      },
-
-      body: JSON.stringify({
-        title: 'Koran',
-        status: 'READING'
-      })
-    });
-    const updatedBook = await response.json();
-    console.log('updatedBook:', updatedBook);
-  };
-
-  const deleteBook = async () => {
-    const bookId = 2;
-    const response = await fetch(`/api/books/${bookId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token}`
-      }
-    });
-    const result = await response.json();
-    console.log('Delete result:', result);
-  };
-
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
