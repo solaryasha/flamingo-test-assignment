@@ -8,15 +8,26 @@ function generateId() {
   return count.toString()
 }
 
+interface State {
+  toasts: Array<{
+    id: string
+    title?: string
+    description?: string
+    action?: React.ReactNode
+    duration?: number
+    dismiss?: () => void
+  }>
+}
+
 const toastStore = {
   state: {
     toasts: [],
-  },
-  listeners: [],
+  } as State,
+  listeners: [] as Array<(state: State) => void>,
   
   getState: () => toastStore.state,
   
-  setState: (nextState) => {
+  setState: (nextState: State | ((state: State) => State)) => {
     if (typeof nextState === 'function') {
       toastStore.state = nextState(toastStore.state)
     } else {
@@ -26,7 +37,7 @@ const toastStore = {
     toastStore.listeners.forEach(listener => listener(toastStore.state))
   },
   
-  subscribe: (listener) => {
+  subscribe: (listener: (state: State) => void) => {
     toastStore.listeners.push(listener)
     return () => {
       toastStore.listeners = toastStore.listeners.filter(l => l !== listener)
@@ -37,20 +48,20 @@ const toastStore = {
 export const toast = ({ ...props }) => {
   const id = generateId()
 
-  const update = (props) =>
-    toastStore.setState((state) => ({
+  const update = (props: State) =>
+    toastStore.setState((state: State) => ({
       ...state,
       toasts: state.toasts.map((t) =>
         t.id === id ? { ...t, ...props } : t
       ),
     }))
 
-  const dismiss = () => toastStore.setState((state) => ({
+  const dismiss = () => toastStore.setState((state: State) => ({
     ...state,
     toasts: state.toasts.filter((t) => t.id !== id),
   }))
 
-  toastStore.setState((state) => ({
+  toastStore.setState((state: State) => ({
     ...state,
     toasts: [
       { ...props, id, dismiss },
@@ -66,10 +77,10 @@ export const toast = ({ ...props }) => {
 }
 
 export function useToast() {
-  const [state, setState] = useState(toastStore.getState())
+  const [state, setState] = useState<State>(toastStore.getState())
   
   useEffect(() => {
-    const unsubscribe = toastStore.subscribe((state) => {
+    const unsubscribe = toastStore.subscribe((state: State) => {
       setState(state)
     })
     
@@ -77,7 +88,7 @@ export function useToast() {
   }, [])
   
   useEffect(() => {
-    const timeouts = []
+    const timeouts: NodeJS.Timeout[] = []
 
     state.toasts.forEach((toast) => {
       if (toast.duration === Infinity) {
@@ -85,7 +96,7 @@ export function useToast() {
       }
 
       const timeout = setTimeout(() => {
-        toast.dismiss()
+        toast.dismiss?.()
       }, toast.duration || 5000)
 
       timeouts.push(timeout)

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type FC } from 'react';
+import React, { useState, type FC } from 'react';
 import { Edit } from 'lucide-react';
 import { DialogHeader } from './ui/dialog';
 import { Label } from '@radix-ui/react-label';

@@ -11,7 +11,7 @@ import { useToast } from '../hooks/useToast';
 
 export function Toaster() {
 	const { toasts } = useToast();
-
+  
 	return (
 		<ToastProvider>
 			{toasts.map(({ id, title, description, action, ...props }) => {

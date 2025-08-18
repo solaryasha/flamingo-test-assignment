@@ -7,9 +7,9 @@ const labelVariants = cva(
   'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
 );
 
-const Label = React.forwardRef(({ className, ...props }, ref) => (
+const Label = React.forwardRef(({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>, ref) => (
   <LabelPrimitive.Root
-    ref={ref}
+    ref={ref as React.Ref<HTMLLabelElement> | undefined}
     className={cn(labelVariants(), className)}
     {...props}
   />

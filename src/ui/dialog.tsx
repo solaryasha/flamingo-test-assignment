@@ -44,7 +44,7 @@ const DialogContent = React.forwardRef(({ className, children, ...props }: React
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-const DialogHeader = ({ className, ...props }: HTMLDivElement) => (
+const DialogHeader = ({ className, ...props }: React.ComponentProps<"div">) => (
   <div
     className={cn(
       'flex flex-col space-y-1.5 text-center sm:text-left',

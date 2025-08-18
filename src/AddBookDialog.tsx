@@ -133,7 +133,7 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook, onRollback, onSu
             </Button>
             <Button
               type="submit"
-              variant="solid"
+              variant="default"
               className="flex-1 floating-gradient hover:scale-105 transition-transform"
             >
               Add Book

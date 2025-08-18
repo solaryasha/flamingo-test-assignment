@@ -1,3 +1,4 @@
+import { supabase } from "../supabaseClient";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCallback, useMemo, useState } from 'react';
 import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf';
@@ -66,6 +67,10 @@ export const Bookshelf = () => {
     ));
   }, [])
 
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
 
 
@@ -85,7 +90,9 @@ export const Bookshelf = () => {
           </p>
         </motion.div>
 
-
+        <Button onClick={signOut} className="mb-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white fixed right-4 top-4">
+          Sign out
+        </Button>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -3,6 +3,7 @@ import { supabase } from "../supabaseClient";
 import { type Session } from '@supabase/supabase-js';
 import { Bookshelf } from './Bookshelf';
 import { Toaster } from './ui/toaster';
+import { Button } from './ui/button';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -21,10 +22,6 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
   const signUp = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -34,7 +31,9 @@ function App() {
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
-        <button onClick={signUp}>Sign in with Google</button>
+        <Button onClick={signUp} className='bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white '>
+          Sign in with Google
+        </Button>
       </div>
     );
   } else {
