@@ -36,7 +36,7 @@ app.use('/', (req, res) => {
 });
 app.use(errorHandler);
 
-export const server = app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App is listening on port ${port}`);
 });
 
