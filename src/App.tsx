@@ -38,7 +38,7 @@ function App() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: getURL();
+        redirectTo: getURL()
       }
     });
   };
