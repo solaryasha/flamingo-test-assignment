@@ -1,4 +1,4 @@
-import React, { useState, type FC } from 'react';
+import React, { useRef, useState, type FC } from 'react';
 import { Book } from 'lucide-react';
 import type { ReadingStatus, Book as BookType } from './types';
 import { DialogHeader } from './ui/dialog';
@@ -8,15 +8,36 @@ import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useAddBook } from './hooks/useAddBook';
+import { useToast } from './hooks/useToast';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onAddBook: (book: BookType) => void;
+  onRollback: (tempId: number) => void;
+  onSuccess: (tempId: number, realBook: BookType) => void; // <-- Add this prop
 }
 
-const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
-  const { addBook } = useAddBook()
+const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook, onRollback, onSuccess }) => {
+  const tempId = useRef(Date.now()); // Temporary ID for optimistic UI
+  const { toast } = useToast();
+
+  const { addBook } = useAddBook({
+    onSuccess: (realBook: BookType) => {
+      toast({
+        title: "Book Added! 📚",
+        description: "New book has been successfully added to your library.",
+      });
+      onSuccess(tempId.current, realBook);
+    },
+    onError: () => {
+      toast({
+        title: "Add Failed! ❌",
+        description: "There was an error adding the book.",
+      });
+      onRollback(tempId.current);
+    }
+  })
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -26,18 +47,25 @@ const AddBookDialog: FC<Props> = ({ isOpen, onClose, onAddBook }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (formData.title && formData.author) {
-      const newBook = await addBook({
+      tempId.current = Date.now(); // Use timestamp as a temporary ID
+      const tempBook = {
+        id: tempId.current,
         title: formData.title,
         author: formData.author,
-        status: formData.status as ReadingStatus
-      })
+        status: formData.status as ReadingStatus,
+      };
+      onAddBook(tempBook);
       setFormData({
         title: '',
         author: '',
         status: 'TO_READ',
       });
-      onAddBook(newBook);
       onClose();
+      await addBook({
+        title: formData.title,
+        author: formData.author,
+        status: formData.status as ReadingStatus
+      })
     }
   };
 

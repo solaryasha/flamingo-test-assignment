@@ -9,7 +9,6 @@ export const useDeleteBook = (bookId: number, {
   onError: () => void;
 }) => {
   const deleteBook = useCallback(async () => {
-    const bookId = 123321123;
     const authData = await supabase.auth.getSession();
     const session = authData.data.session;
     const response = await fetch(`/api/books/${bookId}`, {

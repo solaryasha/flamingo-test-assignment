@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf';
 import { useBooks } from './hooks/useBooks';
 import { Button } from './ui/button';
@@ -9,7 +9,6 @@ import AddBookDialog from './AddBookDialog';
 import BookCard from './BookCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import EditBookDialog from './EditBookDialog';
-import { useToast } from './hooks/useToast';
 
 
 export const Bookshelf = () => {
@@ -18,26 +17,10 @@ export const Bookshelf = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [books, setBooks] = useBooks();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const savedBooks = localStorage.getItem('bookshelf-books');
-    if (savedBooks) {
-      setBooks(JSON.parse(savedBooks));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('bookshelf-books', JSON.stringify(books));
-  }, [books]);
-
 
   const onAddBook = useCallback((newBook: Book) => {
+    console.log('Adding book:', newBook);
     setBooks(prevBooks => [...prevBooks, newBook]);
-    toast({
-      title: "Book Added! 📚",
-      description: `"${newBook.title}" has been added to your ${newBook.status.replace('-', ' ')} list.`,
-    });
   }, []);
 
   const updateBook = useCallback((bookId: number, updatedBookData: Partial<Omit<Book, 'id'>>) => {
@@ -56,10 +39,6 @@ export const Bookshelf = () => {
 
   const deleteBook = useCallback((bookId: number) => {
     setBooks(prev => prev.filter(book => book.id !== bookId));
-    toast({
-      title: "Book Removed 🗑️",
-      description: "Book has been removed from your library.",
-    });
   }, []);
 
   const handleRestore = useCallback((book: Book) => {
@@ -71,7 +50,20 @@ export const Bookshelf = () => {
     setIsEditDialogOpen(true);
   }, []);
 
+  const handleUpdateBookId = useCallback((tempId: number, realBook: Book) => {
+    setBooks(prevBooks => {
+      return prevBooks.map((book) => {
+        if (book.id === tempId) {
+          book.id = realBook.id 
+        }
+        return book;
+      })
+    })
+  }, []);
+
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
+
+
   return (
     <div className="min-h-screen p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -212,6 +204,8 @@ export const Bookshelf = () => {
           isOpen={isAddDialogOpen}
           onClose={() => setIsAddDialogOpen(false)}
           onAddBook={onAddBook}
+          onRollback={deleteBook}
+          onSuccess={handleUpdateBookId}
         />
 
         {editingBook && (
