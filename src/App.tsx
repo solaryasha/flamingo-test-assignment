@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { type Session } from '@supabase/supabase-js';
 import { Bookshelf } from './Bookshelf';
+import { Toaster } from './ui/toaster';
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -38,7 +39,10 @@ function App() {
     );
   } else {
     return (
-      <Bookshelf />
+      <div className="min-h-screen">
+        <Bookshelf />
+        <Toaster />
+      </div>
     );
   }
 }

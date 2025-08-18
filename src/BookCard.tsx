@@ -111,7 +111,7 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit }) => {
             onClick={() => handleStatusChange('READING')}
             className="flex-1 border-white/20 text-white hover:bg-white/10"
           >
-            {book.status === 'TO_READ' ? 'Start READING' : 'Read Again'}
+            {book.status === 'TO_READ' ? 'Start Reading' : 'Read Again'}
           </Button>
         )}
         

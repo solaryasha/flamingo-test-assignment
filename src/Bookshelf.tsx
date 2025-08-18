@@ -9,6 +9,7 @@ import AddBookDialog from './AddBookDialog';
 import BookCard from './BookCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import EditBookDialog from './EditBookDialog';
+import { useToast } from './hooks/useToast';
 
 
 export const Bookshelf = () => {
@@ -17,10 +18,15 @@ export const Bookshelf = () => {
    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [books, setBooks] = useBooks();
+  const { toast } = useToast();
 
 
   const onAddBook = useCallback((newBook: Book) => {
     setBooks(prevBooks => [...prevBooks, newBook]);
+    toast({
+      title: "Book Added! 📚",
+      description: `"${newBook.title}" has been added to your ${newBook.status.replace('-', ' ')} list.`,
+    });
   }, []);
 
   const updateBook = useCallback((bookId: number, updatedBookData: Partial<Omit<Book, 'id'>>) => {
@@ -175,10 +181,10 @@ export const Bookshelf = () => {
         >
           <Button
             onClick={() => setIsAddDialogOpen(true)}
-            size="lg"
-            className="floating-gradient rounded-full w-14 h-14 shadow-2xl hover:scale-110 transition-all duration-300 hover:shadow-purple-500/25"
+            className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 w-14 h-14 shadow-2xl hover:scale-110 transition-all duration-300 hover:shadow-purple-500/25"
           >
-            <Plus className="w-6 h-6" />
+            <Plus className="w-4 h-4" />
+
           </Button>
         </motion.div>
 
@@ -186,7 +192,6 @@ export const Bookshelf = () => {
           isOpen={isAddDialogOpen}
           onClose={() => setIsAddDialogOpen(false)}
           onAddBook={onAddBook}
-
         />
 
         {editingBook && (
