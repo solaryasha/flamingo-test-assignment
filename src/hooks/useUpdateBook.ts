@@ -2,7 +2,13 @@ import { useCallback } from 'react';
 import { supabase } from "../../supabaseClient";
 import type { ReadingStatus } from '../types';
 
-export const useUpdateBook = (bookId?: number) => {
+export const useUpdateBook = (bookId: number, {
+  onSuccess = () => {},
+  onError = () => {},
+}: {
+  onSuccess: () => void;
+  onError: () => void;
+}) => {
   const updateBook = useCallback(async ({
     title,
     author,
@@ -28,9 +34,17 @@ export const useUpdateBook = (bookId?: number) => {
         status
       })
     });
-
-    const updatedBook = await response.json();
-    return updatedBook;
+    try {
+      const updatedBook = await response.json();
+      if (!response.ok) {
+        throw new Error(updatedBook.message || 'Failed to update book');
+      }
+      onSuccess();
+      return updatedBook;
+    } catch {
+      onError();
+      return false
+    }
   }, []);
 
   return { updateBook };

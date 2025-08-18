@@ -1,8 +1,15 @@
 import { useCallback } from 'react';
 import { supabase } from "../../supabaseClient";
 
-export const useDeleteBook = (bookId: number) => {
+export const useDeleteBook = (bookId: number, {
+  onSuccess = () => {},
+  onError = () => {},
+}: {
+  onSuccess: () => void;
+  onError: () => void;
+}) => {
   const deleteBook = useCallback(async () => {
+    const bookId = 123321123;
     const authData = await supabase.auth.getSession();
     const session = authData.data.session;
     const response = await fetch(`/api/books/${bookId}`, {
@@ -12,7 +19,17 @@ export const useDeleteBook = (bookId: number) => {
         'Authorization': `Bearer ${session?.access_token}`
       }
     });
-    await response.json();
+    try {
+      await response.json();
+      if (!response.ok) {
+        throw new Error('Failed to delete book');
+      }
+      onSuccess();
+      return true;
+    } catch {
+      onError();
+      return false
+    }
   }, []);
 
   return { deleteBook };

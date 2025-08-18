@@ -1,53 +1,62 @@
-import React, { type FC } from 'react';
-import { MoreVertical, Edit, Trash2, BookOpen, CheckCircle, Clock } from 'lucide-react';
+import { type FC } from 'react';
+import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown';
 import type { Book, ReadingStatus } from './types';
 import { Button } from './ui/button';
 import { useUpdateBook } from './hooks/useUpdateBook';
 import { useDeleteBook } from './hooks/useDeleteBook';
+import { useToast } from './hooks/useToast';
+import { getStatusColor, getStatusIcon, getStatusLabel } from './utils/bookCard';
 
 interface Props {
   book: Book
   onStatusChange: (bookId: number, status: ReadingStatus) => void;
   onDelete: (bookId: number) => void;
   onEdit: (book: Book) => void;
+  onRestore: (book: Book) => void; // Optional for restore functionality
 }
 
 
-const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit }) => {
-  const getStatusColor = (status: ReadingStatus) => {
-    switch (status) {
-      case 'TO_READ': return 'from-blue-500/20 to-purple-500/20';
-      case 'READING': return 'from-green-500/20 to-blue-500/20';
-      case 'READ': return 'from-purple-500/20 to-pink-500/20';
-      default: return 'from-gray-500/20 to-gray-600/20';
-    }
-  };
+const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit, onRestore }) => {
+  const { toast } = useToast();
 
-  const getStatusIcon = (status: ReadingStatus) => {
-    switch (status) {
-      case 'TO_READ': return <Clock className="w-4 h-4" />;
-      case 'READING': return <BookOpen className="w-4 h-4" />;
-      case 'READ': return <CheckCircle className="w-4 h-4" />;
-      default: return null;
-    }
-  };
+  const { updateBook } = useUpdateBook(book!.id, {
+    onSuccess: () => {
+      toast({
+        title: "Status Updated! ✨",
+        description: "Book status has been successfully updated.",
+      });
+    },
+    onError: () => {
+      const previousStatus = book.status;
+      toast({
+        title: "Update Failed! ❌",
+        description: "There was an error updating the book status.",
+      });
 
-  const getStatusLabel = (status: ReadingStatus) => {
-    switch (status) {
-      case 'TO_READ': return 'To Read';
-      case 'READING': return 'READING';
-      case 'READ': return 'Completed';
-      default: return status;
+      onStatusChange(book.id, previousStatus);
     }
-  };
-
-  const { updateBook } = useUpdateBook(book.id);
-  const { deleteBook } = useDeleteBook(book.id);
+  });
+  const { deleteBook } = useDeleteBook(book.id, {
+    onSuccess: () => {
+      toast({
+        title: "Book Removed 🗑️",
+        description: "Book has been removed from your library.",
+      });
+    },
+    onError: () => {
+      const previousBook = book;
+      toast({
+        title: "Delete Failed! ❌",
+        description: "There was an error deleting the book.",
+      });
+      onRestore(previousBook);
+    }
+  });
 
   const handleStatusChange = async (newStatus: ReadingStatus) => {
-    await updateBook({ status: newStatus });
     onStatusChange(book.id, newStatus);
+    await updateBook({ status: newStatus });
   };
 
   const handleEdit = () => {
@@ -55,8 +64,8 @@ const BookCard: FC<Props> = ({ book, onStatusChange, onDelete, onEdit }) => {
   };
 
   const handleDelete = async () => {
-    await deleteBook();
     onDelete(book.id);
+    await deleteBook();
   };
 
   return (

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf';
 import { useBooks } from './hooks/useBooks';
 import { Button } from './ui/button';
@@ -15,10 +15,21 @@ import { useToast } from './hooks/useToast';
 export const Bookshelf = () => {
   const [activeTab, setActiveTab] = useState('TO_READ');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [books, setBooks] = useBooks();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const savedBooks = localStorage.getItem('bookshelf-books');
+    if (savedBooks) {
+      setBooks(JSON.parse(savedBooks));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('bookshelf-books', JSON.stringify(books));
+  }, [books]);
 
 
   const onAddBook = useCallback((newBook: Book) => {
@@ -30,7 +41,7 @@ export const Bookshelf = () => {
   }, []);
 
   const updateBook = useCallback((bookId: number, updatedBookData: Partial<Omit<Book, 'id'>>) => {
-    setBooks(prev => prev.map(book => 
+    setBooks(prev => prev.map(book =>
       book.id === bookId ? { ...book, ...updatedBookData } : book
     ));
     setIsEditDialogOpen(false);
@@ -38,16 +49,24 @@ export const Bookshelf = () => {
   }, []);
 
   const updateBookStatus = useCallback((bookId: number, newStatus: ReadingStatus) => {
-    setBooks(previousBooks => previousBooks.map(book => 
+    setBooks(previousBooks => previousBooks.map(book =>
       book.id === bookId ? { ...book, status: newStatus } : book
     ));
   }, [])
 
   const deleteBook = useCallback((bookId: number) => {
     setBooks(prev => prev.filter(book => book.id !== bookId));
+    toast({
+      title: "Book Removed 🗑️",
+      description: "Book has been removed from your library.",
+    });
   }, []);
 
-   const handleEditBook = useCallback((book: Book) => {
+  const handleRestore = useCallback((book: Book) => {
+    setBooks(prev => [book, ...prev]);
+  }, []);
+
+  const handleEditBook = useCallback((book: Book) => {
     setEditingBook(book);
     setIsEditDialogOpen(true);
   }, []);
@@ -69,7 +88,7 @@ export const Bookshelf = () => {
           </p>
         </motion.div>
 
-  
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -86,7 +105,7 @@ export const Bookshelf = () => {
                 <span className="hidden sm:inline">To Read</span>
                 <span className="sm:hidden">To Read</span>
                 <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
-                  {getTabCount(books,'TO_READ')}
+                  {getTabCount(books, 'TO_READ')}
                 </span>
               </TabsTrigger>
               <TabsTrigger
@@ -161,6 +180,7 @@ export const Bookshelf = () => {
                             onStatusChange={updateBookStatus}
                             onDelete={deleteBook}
                             onEdit={handleEditBook}
+                            onRestore={handleRestore}
                           />
                         </motion.div>
                       ))}
@@ -172,7 +192,7 @@ export const Bookshelf = () => {
           </Tabs>
         </motion.div>
 
-  
+
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
