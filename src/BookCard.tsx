@@ -3,14 +3,17 @@ import { MoreVertical, Edit, Trash2, BookOpen, CheckCircle, Clock } from 'lucide
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown';
 import type { Book, ReadingStatus } from './types';
 import { Button } from './ui/button';
+import { useUpdateBook } from './hooks/useUpdateBook';
+import { useDeleteBook } from './hooks/useDeleteBook';
 
 interface Props {
   book: Book
   onStatusChange: (bookId: number, status: ReadingStatus) => void;
+  onDelete: (bookId: number) => void;
 }
 
 
-const BookCard: FC<Props> = ({ book, onStatusChange }) => {
+const BookCard: FC<Props> = ({ book, onStatusChange, onDelete }) => {
   const getStatusColor = (status: ReadingStatus) => {
     switch (status) {
       case 'TO_READ': return 'from-blue-500/20 to-purple-500/20';
@@ -24,7 +27,7 @@ const BookCard: FC<Props> = ({ book, onStatusChange }) => {
     switch (status) {
       case 'TO_READ': return <Clock className="w-4 h-4" />;
       case 'READING': return <BookOpen className="w-4 h-4" />;
-      case 'read': return <CheckCircle className="w-4 h-4" />;
+      case 'READ': return <CheckCircle className="w-4 h-4" />;
       default: return null;
     }
   };
@@ -33,18 +36,25 @@ const BookCard: FC<Props> = ({ book, onStatusChange }) => {
     switch (status) {
       case 'TO_READ': return 'To Read';
       case 'READING': return 'READING';
-      case 'read': return 'Completed';
+      case 'READ': return 'Completed';
       default: return status;
     }
   };
 
-  const handleStatusChange = (newStatus: ReadingStatus) => {
+  const { updateBook } = useUpdateBook(book.id);
+  const { deleteBook } = useDeleteBook(book.id);
+
+  const handleStatusChange = async (newStatus: ReadingStatus) => {
+    await updateBook({ status: newStatus });
     onStatusChange(book.id, newStatus);
   };
 
   const handleEdit = () => {};
 
-  const handleDelete = () => {};
+  const handleDelete = async () => {
+    await deleteBook();
+    onDelete(book.id);
+  };
 
   return (
     <div

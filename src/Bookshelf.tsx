@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { getEmptyStateMessage, getTabCount, getTabIcon } from './utils/bookshelf';
 import { useBooks } from './hooks/useBooks';
 import { Button } from './ui/button';
@@ -16,15 +16,19 @@ export const Bookshelf = () => {
   const [books, setBooks] = useBooks();
 
 
-  const onAddBook = (newBook: Book) => {
+  const onAddBook = useCallback((newBook: Book) => {
     setBooks(prevBooks => [...prevBooks, newBook]);
-  };
+  }, []);
 
-  const updateBookStatus = (bookId: number, newStatus: ReadingStatus) => {
+  const updateBookStatus = useCallback((bookId: number, newStatus: ReadingStatus) => {
     setBooks(previousBooks => previousBooks.map(book => 
       book.id === bookId ? { ...book, status: newStatus } : book
     ));
-  }
+  }, [])
+
+  const deleteBook = useCallback((bookId: number) => {
+    setBooks(prev => prev.filter(book => book.id !== bookId));
+  }, []);
 
   const filteredBooks = useMemo(() => books.filter(book => book.status === activeTab), [books, activeTab]);
   return (
@@ -133,7 +137,7 @@ export const Bookshelf = () => {
                           <BookCard
                             book={book}
                             onStatusChange={updateBookStatus}
-                            // onDelete={deleteBook}
+                            onDelete={deleteBook}
                           />
                         </motion.div>
                       ))}

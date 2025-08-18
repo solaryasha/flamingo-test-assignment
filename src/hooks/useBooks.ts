@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from "../../supabaseClient";
 import type { Book } from '../types';
+
 export const useBooks = () => {
   const [books, setBooks] = useState<Book[]>([]);
 
